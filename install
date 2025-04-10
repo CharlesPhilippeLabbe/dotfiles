@@ -1,5 +1,5 @@
 #!/bin/bash
-
+cd $(dirname $0)
 stow_files=("nvim" "tmux" "git")
 for folder in ${stow_files[@]}; do
 	echo "stow $folder"
