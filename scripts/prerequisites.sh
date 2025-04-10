@@ -1,4 +1,5 @@
 #!/bin/bash
+cd $(dirname $0)
 apt-get update
 apt-get install git btop tmux stow
 ./install_nvim.sh
