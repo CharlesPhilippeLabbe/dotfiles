@@ -2,7 +2,6 @@
 	helper = store
 [user]
 	name = Charles-Philippe Labbé
-	email = c.p@o-possum.com
 [core]
 	editor = nvim
 
