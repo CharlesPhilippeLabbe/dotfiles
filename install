@@ -4,15 +4,11 @@ cd $(dirname $0)
 git submodule init
 git submodule update
 
-stow_files=("nvim" "tmux" "git")
+stow_files=("nvim" "tmux" "git" "profile")
 for folder in ${stow_files[@]}; do
 	echo "stow $folder"
     stow -D $folder
     stow $folder
 done
 
-echo "parse_git_branch() {
-     git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/(\1)/'
-}
-export PS1=\"\u@\h \[\e[32m\]\w \[\e[91m\]\$(parse_git_branch)\[\e[00m\]$ \"" >> ~/.bash_profile
 source ~/.bash_profile

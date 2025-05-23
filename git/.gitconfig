@@ -1,7 +1,8 @@
 [credential]
 	helper = store
 [user]
-	name = Charles-Philippe Labbé
+    name = CharlesPhilippeLabbe
+    email = c.p.labbe@me.com
 [core]
 	editor = nvim
 
