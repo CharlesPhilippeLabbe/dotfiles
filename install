@@ -1,14 +1,33 @@
 #!/bin/bash
-cd $(dirname $0)
+cd "$(dirname "$0")"
+source scripts/lib.sh
+
+command -v stow >/dev/null || pkg_install stow
 
 git submodule init
 git submodule update
 
-stow_files=("nvim" "tmux" "git" "profile")
-for folder in ${stow_files[@]}; do
-	echo "stow $folder"
-    stow -D $folder
-    stow $folder
+# Move aside pre-existing real files/dirs (e.g. Omarchy's stock nvim config) so stow can link
+backup_if_real() {
+    if [ -e "$1" ] && [ ! -L "$1" ]; then
+        echo "backup $1 -> $1.bak"
+        mv "$1" "$1.bak"
+    fi
+}
+backup_if_real ~/.config/nvim
+backup_if_real ~/.tmux.conf
+backup_if_real ~/.gitconfig
+
+stow_files=("nvim" "tmux" "git")
+for folder in "${stow_files[@]}"; do
+    echo "stow $folder"
+    stow -D "$folder"
+    stow "$folder"
 done
 
-source ~/.bash_profile
+# Shell: source from ~/.bashrc rather than replacing it (Omarchy owns .bashrc/.bash_profile)
+line="[ -f \"$PWD/profile/.dotfiles_profile\" ] && source \"$PWD/profile/.dotfiles_profile\""
+touch ~/.bashrc
+grep -qF "profile/.dotfiles_profile" ~/.bashrc || echo "$line" >> ~/.bashrc
+
+source ~/.bashrc

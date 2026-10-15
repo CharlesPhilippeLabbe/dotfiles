@@ -1,7 +1,18 @@
 #!/bin/bash
-cd $(dirname $0)
-DEBIAN_FRONTEND=noninteractive apt update && apt install -y git btop tmux stow fzf
-./install_nvim.sh
+cd "$(dirname "$0")"
+source ./lib.sh
 
-curl -LO https://github.com/BurntSushi/ripgrep/releases/download/14.1.0/ripgrep_14.1.0-1_amd64.deb
-dpkg -i ripgrep_14.1.0-1_amd64.deb
+if is_arch; then
+    # Omarchy ships most of these; --needed skips what is present
+    pkg_install git btop tmux stow fzf ripgrep neovim
+else
+    pkg_install git btop tmux stow fzf curl wget
+    ./install_nvim.sh
+
+    if ! command -v rg >/dev/null; then
+        deb="ripgrep_14.1.0-1_$(deb_arch).deb"
+        curl -LO "https://github.com/BurntSushi/ripgrep/releases/download/14.1.0/$deb"
+        $SUDO dpkg -i "$deb"
+        rm -f "$deb"
+    fi
+fi
