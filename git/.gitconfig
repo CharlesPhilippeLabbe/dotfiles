@@ -5,4 +5,5 @@
     email = c.p.labbe@me.com
 [core]
 	editor = nvim
-
+[alias]
+    graph = log --graph --oneline
