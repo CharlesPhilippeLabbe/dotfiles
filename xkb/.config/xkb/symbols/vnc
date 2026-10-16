@@ -1,0 +1,17 @@
+// Layout for wayvnc, used by iPad RealVNC Viewer.
+// RealVNC sends Cmd as Alt_L and Option as ISO_Level3_Shift, so neither can
+// reach Super. wayvnc looks keysyms up in this keymap, so the keysyms must
+// stay; only the modifier each key sets changes: Cmd sets Super, Option sets Alt.
+default partial alphanumeric_keys modifier_keys
+xkb_symbols "basic" {
+    include "us(basic)"
+    name[Group1] = "English (US, VNC)";
+
+    key <LALT> { type = "ONE_LEVEL", symbols[Group1] = [ Alt_L ],
+                 actions[Group1] = [ SetMods(modifiers = Mod4) ] };
+    key <LVL3> { type = "ONE_LEVEL", symbols[Group1] = [ ISO_Level3_Shift ],
+                 actions[Group1] = [ SetMods(modifiers = Mod1) ] };
+
+    modifier_map Mod4 { <LALT> };
+    modifier_map Mod1 { <LVL3> };
+};

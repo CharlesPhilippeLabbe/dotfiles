@@ -1,0 +1,8 @@
+address=0.0.0.0
+port=5900
+enable_auth=true
+username=cp
+rsa_private_key_file=/home/cp/.config/wayvnc/rsa_key.pem
+private_key_file=/home/cp/.config/wayvnc/tls_key.pem
+certificate_file=/home/cp/.config/wayvnc/tls_cert.pem
+xkb_layout=vnc

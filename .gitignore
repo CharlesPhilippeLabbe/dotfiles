@@ -1,0 +1,3 @@
+# wayvnc: the real config holds the VNC password; keys are per machine
+wayvnc/config
+*.pem

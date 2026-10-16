@@ -1,0 +1,24 @@
+#!/bin/bash
+# Keep wayvnc reachable with or without a physical monitor.
+# No real output -> create HEADLESS-1. Real output back -> drop it.
+# Restarts wayvnc if it exits.
+
+real_outputs() {
+  hyprctl monitors -j | jq -r '.[].name' | grep -vE '^(HEADLESS-|FALLBACK)'
+}
+
+has_headless() {
+  hyprctl monitors -j | jq -e 'any(.[]; .name == "HEADLESS-1")' >/dev/null
+}
+
+while true; do
+  if [[ -z $(real_outputs) ]]; then
+    has_headless || hyprctl output create headless HEADLESS-1 >/dev/null
+  elif has_headless; then
+    hyprctl output remove HEADLESS-1 >/dev/null
+  fi
+
+  pgrep -u "$UID" -x wayvnc >/dev/null || wayvnc &
+
+  sleep 5
+done

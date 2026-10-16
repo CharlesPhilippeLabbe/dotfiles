@@ -17,13 +17,36 @@ backup_if_real() {
 backup_if_real ~/.config/nvim
 backup_if_real ~/.tmux.conf
 backup_if_real ~/.gitconfig
+backup_if_real ~/.config/hypr/autostart.lua
+backup_if_real ~/.config/hypr/monitors.lua
+backup_if_real ~/.config/hypr/bindings.lua
+backup_if_real ~/.config/xkb
+backup_if_real ~/.local/bin/wayvnc-headless
 
-stow_files=("nvim" "tmux" "git")
+stow_files=("nvim" "tmux" "git" "hypr" "xkb" "bin")
 for folder in "${stow_files[@]}"; do
     echo "stow $folder"
     stow -D "$folder"
     stow "$folder"
 done
+
+# wayvnc: build the config from the template (no password in the repo) and make per-machine keys
+setup_wayvnc() {
+    local dir=~/.config/wayvnc
+    mkdir -p "$dir"
+    if [ ! -f "$dir/config" ]; then
+        read -rsp "wayvnc password: " vnc_password; echo
+        { cat wayvnc/config.template; echo "password=$vnc_password"; } > "$dir/config"
+        chmod 600 "$dir/config"
+    fi
+    [ -f "$dir/rsa_key.pem" ] || { ssh-keygen -q -m pem -t rsa -N "" -f "$dir/rsa_key.pem" && rm -f "$dir/rsa_key.pem.pub"; }
+    [ -f "$dir/tls_key.pem" ] || openssl req -x509 -newkey ec -pkeyopt ec_paramgen_curve:secp384r1 -sha384 -days 3650 -nodes \
+        -keyout "$dir/tls_key.pem" -out "$dir/tls_cert.pem" -subj "/CN=$(hostnamectl hostname)" 2>/dev/null
+}
+setup_wayvnc
+
+# SDDM: log back in after logout so wayvnc comes back
+sudo install -Dm644 system/etc/sddm.conf.d/autologin.conf /etc/sddm.conf.d/autologin.conf
 
 # Shell: source from ~/.bashrc rather than replacing it (Omarchy owns .bashrc/.bash_profile)
 line="[ -f \"$PWD/profile/.dotfiles_profile\" ] && source \"$PWD/profile/.dotfiles_profile\""
