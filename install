@@ -17,13 +17,19 @@ backup_if_real() {
 backup_if_real ~/.config/nvim
 backup_if_real ~/.tmux.conf
 backup_if_real ~/.gitconfig
-backup_if_real ~/.config/hypr/autostart.lua
-backup_if_real ~/.config/hypr/monitors.lua
-backup_if_real ~/.config/hypr/bindings.lua
-backup_if_real ~/.config/xkb
-backup_if_real ~/.local/bin/wayvnc-headless
 
-stow_files=("nvim" "tmux" "git" "hypr" "xkb" "bin")
+stow_files=("nvim" "tmux" "git")
+
+# Omarchy-only packages: never linked on Debian/Ubuntu or plain Arch
+if is_omarchy; then
+    backup_if_real ~/.config/hypr/autostart.lua
+    backup_if_real ~/.config/hypr/monitors.lua
+    backup_if_real ~/.config/hypr/bindings.lua
+    backup_if_real ~/.config/xkb
+    backup_if_real ~/.local/bin/wayvnc-headless
+    stow_files+=("hypr" "xkb" "bin")
+fi
+
 for folder in "${stow_files[@]}"; do
     echo "stow $folder"
     stow -D "$folder"
@@ -43,10 +49,12 @@ setup_wayvnc() {
     [ -f "$dir/tls_key.pem" ] || openssl req -x509 -newkey ec -pkeyopt ec_paramgen_curve:secp384r1 -sha384 -days 3650 -nodes \
         -keyout "$dir/tls_key.pem" -out "$dir/tls_cert.pem" -subj "/CN=$(hostnamectl hostname)" 2>/dev/null
 }
-setup_wayvnc
 
-# SDDM: log back in after logout so wayvnc comes back
-sudo install -Dm644 system/etc/sddm.conf.d/autologin.conf /etc/sddm.conf.d/autologin.conf
+if is_omarchy; then
+    setup_wayvnc
+    # SDDM: log back in after logout so wayvnc comes back
+    $SUDO install -Dm644 system/etc/sddm.conf.d/autologin.conf /etc/sddm.conf.d/autologin.conf
+fi
 
 # Shell: source from ~/.bashrc rather than replacing it (Omarchy owns .bashrc/.bash_profile)
 line="[ -f \"$PWD/profile/.dotfiles_profile\" ] && source \"$PWD/profile/.dotfiles_profile\""

@@ -6,6 +6,8 @@ if [ -r /etc/os-release ]; then
 fi
 
 is_arch() { [[ "$ID" == "arch" || "$ID" == "omarchy" || "$ID_LIKE" == *arch* ]]; }
+# Omarchy desktop (Hyprland, wayvnc, SDDM): plain Arch, Debian and Ubuntu get none of its configs
+is_omarchy() { [ -d /usr/share/omarchy ]; }
 is_debian() { [[ "$ID" == "debian" || "$ID" == "ubuntu" || "$ID_LIKE" == *debian* ]]; }
 
 SUDO=""
